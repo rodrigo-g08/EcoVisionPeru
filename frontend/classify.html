@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>EcoVision Perú | Demo con cámara</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+</head>
+<body class="page--dark">
+  <!-- Navbar reutilizada -->
+  <header class="nav">
+    <div class="nav__logo">
+      <div class="nav__logo-mark">EV</div>
+      <div class="nav__logo-text">
+        <span class="nav__brand-main">EcoVision</span>
+        <span class="nav__brand-sub">Perú</span>
+      </div>
+    </div>
+
+    <nav class="nav__links">
+      <a href="index.html#hero" class="nav__link">Inicio</a>
+      <a href="index.html#how" class="nav__link">Cómo funciona</a>
+      <a href="index.html#tech" class="nav__link">Tecnología</a>
+      <a href="index.html#roadmap" class="nav__link">Roadmap</a>
+    </nav>
+
+    <div class="nav__actions">
+      <a href="index.html" class="btn btn--ghost">Volver al landing</a>
+    </div>
+  </header>
+
+  <!-- Contenedor principal -->
+  <main class="section" style="padding-top: 60px;">
+    <div class="section__header">
+      <h2 class="section__title">Demo en vivo con cámara</h2>
+      <p class="section__subtitle">
+        EcoVision usa tu webcam para capturar un objeto dentro del recuadro,
+        enviar la imagen al modelo y mostrar en tiempo real el tipo de plástico estimado.
+      </p>
+    </div>
+
+    <div style="display:flex; gap:40px;">
+      <!-- Panel de cámara -->
+      <section style="width:60%;">
+        <div class="hero-card">
+          <div class="hero-card__header">
+            <span class="hero-card__dot hero-card__dot--red"></span>
+            <span class="hero-card__dot hero-card__dot--yellow"></span>
+            <span class="hero-card__dot hero-card__dot--green"></span>
+            <span class="hero-card__title">Webcam · EcoVision Perú</span>
+          </div>
+
+          <div class="hero-card__body">
+            <div
+              class="hero-card__camera-frame"
+              style="position:relative; background:#000;"
+            >
+              <!-- Video de la webcam -->
+              <video
+                id="cameraVideo"
+                autoplay
+                playsinline
+                muted
+                style="width:100%; height:100%; object-fit:cover;"
+              ></video>
+
+              <!-- Canvas para dibujar recuadro / overlays -->
+              <canvas
+                id="cameraOverlay"
+                width="640"
+                height="480"
+                style="position:absolute; top:0; left:0; width:100%; height:100%;"
+              ></canvas>
+
+              <!-- Mensaje flotante -->
+              <div
+                id="cameraHint"
+                style="
+                  position:absolute;
+                  bottom:12px;
+                  left:12px;
+                  font-size:13px;
+                  opacity:0.75;
+                "
+              >
+                Centra el objeto en el recuadro y pulsa <strong>C</strong> o el botón “Capturar”.
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; margin-top:20px; align-items:center;">
+              <div style="display:flex; gap:10px;">
+                <button id="btnStartCamera" class="btn btn--ghost btn--lg">
+                  Activar cámara
+                </button>
+                <button id="btnCapture" class="btn btn--primary btn--lg" disabled>
+                  Capturar y clasificar
+                </button>
+              </div>
+
+              <div style="font-size:13px; opacity:0.7;">
+                Atajo: pulsa <code>C</code> para capturar · <code>Q</code> para limpiar overlays.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel de resultado -->
+      <section style="width:40%;">
+        <div class="card">
+          <h3 class="card__title">Resultado actual</h3>
+          <p class="card__text">
+            Aquí verás la última predicción del modelo para el objeto capturado
+            dentro del recuadro de la cámara.
+          </p>
+
+          <div
+            id="resultBox"
+            style="
+              margin-top:15px;
+              padding:18px;
+              border-radius:12px;
+              border:1px solid rgba(255,255,255,0.1);
+              background:rgba(255,255,255,0.03);
+            "
+          >
+            <p id="resultLabel" style="font-size:18px; font-weight:600;">
+              Aún no hay predicciones.
+            </p>
+            <p
+              id="resultConfidence"
+              style="margin-top:5px; font-size:14px; opacity:0.7;"
+            >
+              Captura un objeto para ver el tipo de plástico estimado.
+            </p>
+            <p
+              id="resultHint"
+              style="margin-top:10px; font-size:13px; opacity:0.7;"
+            >
+              Asegúrate de que el objeto ocupe la mayor parte posible del recuadro
+              y evita fondos muy recargados.
+            </p>
+          </div>
+
+          <div style="margin-top:25px;">
+            <h4 style="font-size:16px; margin-bottom:8px;">Historial de capturas</h4>
+            <div
+              id="historyList"
+              style="
+                max-height:220px;
+                overflow-y:auto;
+                border-radius:10px;
+                border:1px solid rgba(255,255,255,0.06);
+                background:rgba(255,255,255,0.02);
+                padding:10px 12px;
+                font-size:13px;
+              "
+            >
+              <p style="opacity:0.7;">
+                Aún no hay capturas. Cada vez que clasifiques un objeto,
+                aparecerá aquí un registro con hora y resultado.
+              </p>
+            </div>
+          </div>
+
+          <div style="margin-top:25px;">
+            <h4 style="font-size:16px; margin-bottom:8px;">Leyenda de clases</h4>
+            <ul class="card__list" style="font-size:13px;">
+              <li><strong>PC</strong> – Policarbonato</li>
+              <li><strong>PE</strong> – Polietileno</li>
+              <li><strong>PET</strong> – Tereftalato de polietileno</li>
+              <li><strong>PP</strong> – Polipropileno</li>
+              <li><strong>PS</strong> – Poliestireno</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

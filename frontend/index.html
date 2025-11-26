@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>EcoVision Perú | IA para la clasificación de plásticos</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+</head>
+<body class="page page--dark">
+  <!-- Barra de navegación -->
+  <header class="nav">
+    <div class="nav__logo">
+      <div class="nav__logo-mark">EV</div>
+      <div class="nav__logo-text">
+        <span class="nav__brand-main">EcoVision</span>
+        <span class="nav__brand-sub">Perú</span>
+      </div>
+    </div>
+
+    <nav class="nav__links">
+      <a href="#hero" class="nav__link">Inicio</a>
+      <a href="#how" class="nav__link">Cómo funciona</a>
+      <a href="#usecases" class="nav__link">Casos de uso</a>
+      <a href="#tech" class="nav__link">Tecnología</a>
+      <a href="#roadmap" class="nav__link">Roadmap</a>
+    </nav>
+
+    <div class="nav__actions">
+      <a href="classify.html" class="btn btn--primary">Probar demo</a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section id="hero" class="hero">
+    <div class="hero__content">
+      <p class="hero__eyebrow">Computer Vision · IA responsable · Economía circular</p>
+      <h1 class="hero__title">
+        Clasificación inteligente de plásticos
+        <span class="hero__title-gradient">en tiempo real</span>
+      </h1>
+      <p class="hero__subtitle">
+        EcoVision Perú utiliza modelos de deep learning para identificar el tipo de plástico
+        directamente desde la cámara. Pensado para puntos de acopio, plantas de reciclaje
+        y proyectos educativos que quieren mostrar el potencial de la IA aplicada al medio ambiente.
+      </p>
+
+      <div class="hero__cta-row">
+        <a href="classify.html" class="btn btn--primary btn--lg">
+          <span>Iniciar demo con cámara</span>
+        </a>
+        <button class="btn btn--ghost btn--lg" data-scroll="#how">
+          Ver cómo funciona
+        </button>
+      </div>
+
+      <div class="hero__tags">
+        <span class="tag">MobileNetV5 + L2</span>
+        <span class="tag">Clasificación PC · PE · PET · PP · PS</span>
+        <span class="tag">Procesamiento en local</span>
+      </div>
+    </div>
+
+    <div class="hero__preview">
+      <div class="hero-card">
+        <div class="hero-card__header">
+          <span class="hero-card__dot hero-card__dot--red"></span>
+          <span class="hero-card__dot hero-card__dot--yellow"></span>
+          <span class="hero-card__dot hero-card__dot--green"></span>
+          <span class="hero-card__title">EcoVision · Demo en vivo</span>
+        </div>
+        <div class="hero-card__body">
+          <div class="hero-card__camera-frame">
+            <div class="hero-card__camera-preview">
+              <div class="hero-card__square"></div>
+              <div class="hero-card__hint">Recuadro de enfoque</div>
+            </div>
+            <div class="hero-card__overlay">
+              <div class="hero-card__chip">PP · Polipropileno · 92.3%</div>
+            </div>
+          </div>
+          <div class="hero-card__footer">
+            <div class="hero-card__stat">
+              <span class="hero-card__stat-label">Inferencias</span>
+              <span class="hero-card__stat-value">~25 ms</span>
+            </div>
+            <div class="hero-card__stat">
+              <span class="hero-card__stat-label">Clases</span>
+              <span class="hero-card__stat-value">5 tipos de plástico</span>
+            </div>
+            <div class="hero-card__stat">
+              <span class="hero-card__stat-label">Modo</span>
+              <span class="hero-card__stat-value">Offline / Local</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero__note">
+        <span class="hero__note-dot"></span>
+        <p>
+          La demo corre sobre tu dispositivo usando el modelo entrenado
+          <strong>MobileNetV5</strong> con regularización L2, optimizada para
+          clasificación rápida a partir de la webcam.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cómo funciona -->
+  <section id="how" class="section section--bordered">
+    <div class="section__header">
+      <h2 class="section__title">¿Cómo funciona EcoVision Perú?</h2>
+      <p class="section__subtitle">
+        Desde la cámara hasta la predicción de la categoría de plástico en tres pasos claros.
+      </p>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step__index">01</div>
+        <h3 class="step__title">Captura controlada</h3>
+        <p class="step__text">
+          El usuario centra el objeto en un recuadro guía. El sistema solo captura cuando se pulsa
+          <code>c</code>, evitando clasificaciones sobre ruido de fondo o movimiento.
+        </p>
+      </div>
+      <div class="step">
+        <div class="step__index">02</div>
+        <h3 class="step__title">Preprocesamiento + MobileNetV5</h3>
+        <p class="step__text">
+          La imagen se redimensiona a 224×224, se normaliza y pasa a través de una versión
+          ajustada de MobileNetV2 (MobileNetV5) con data augmentation y regularización L2,
+          entrenada específicamente para plásticos.
+        </p>
+      </div>
+      <div class="step">
+        <div class="step__index">03</div>
+        <h3 class="step__title">Predicción interpretable</h3>
+        <p class="step__text">
+          El modelo devuelve la clase más probable (PC, PE, PET, PP o PS) junto con el porcentaje
+          de confianza. La interfaz muestra el resultado sobre el recuadro de enfoque para una
+          lectura inmediata.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Casos de uso -->
+  <section id="usecases" class="section">
+    <div class="section__header">
+      <h2 class="section__title">Casos de uso</h2>
+      <p class="section__subtitle">
+        Más que una demo: una base técnica para proyectos reales de gestión de residuos.
+      </p>
+    </div>
+
+    <div class="cards">
+      <article class="card">
+        <h3 class="card__title">Puntos de reciclaje inteligentes</h3>
+        <p class="card__text">
+          Instalar EcoVision en puntos de acopio permite guiar a las personas
+          en la correcta separación de plásticos, reduciendo contaminación cruzada
+          y mejorando la calidad del material reciclado.
+        </p>
+        <ul class="card__list">
+          <li>Interfaz simple para voluntarios y público general.</li>
+          <li>Registro de tipos de plásticos detectados.</li>
+          <li>Posible integración con pantallas informativas.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h3 class="card__title">Laboratorios y cursos universitarios</h3>
+        <p class="card__text">
+          Ideal para mostrar en clase cómo se entrenan modelos de visión computacional aplicados
+          a problemas ambientales concretos, desde el dataset hasta la inferencia en vivo.
+        </p>
+        <ul class="card__list">
+          <li>Explicación paso a paso del pipeline.</li>
+          <li>Notebook reproducible en Colab.</li>
+          <li>Comparación entre modelos base y modelos “boosteados”.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h3 class="card__title">Prototipos de líneas de clasificación</h3>
+        <p class="card__text">
+          La demo puede extenderse para integrarse con hardware (cintas, sensores) y tomar
+          decisiones sobre el flujo de materiales en pequeños prototipos de planta.
+        </p>
+        <ul class="card__list">
+          <li>API local vía HTTP.</li>
+          <li>Decisiones en milisegundos.</li>
+          <li>Escenario ideal para pruebas de concepto.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <!-- Tecnología -->
+  <section id="tech" class="section section--bordered">
+    <div class="section__header">
+      <h2 class="section__title">Tecnología bajo el capó</h2>
+      <p class="section__subtitle">
+        Un stack pensado para correr en local hoy y escalar a web o móvil mañana.
+      </p>
+    </div>
+
+    <div class="tech-grid">
+      <div class="tech-grid__col">
+        <h3 class="tech-grid__title">Modelo de IA</h3>
+        <ul class="tech-grid__list">
+          <li><strong>Base:</strong> MobileNetV2 (224×224, include_top=False).</li>
+          <li><strong>Head:</strong> GlobalAveragePooling + Dense(512, ReLU, L2) + Dense(5, softmax, L2).</li>
+          <li><strong>Data augmentation:</strong> RandomFlip, RandomRotation, RandomZoom.</li>
+          <li><strong>Entrenamiento:</strong> MobileNetV5 “booster” con regularización L2.</li>
+        </ul>
+      </div>
+      <div class="tech-grid__col">
+        <h3 class="tech-grid__title">Backend</h3>
+        <ul class="tech-grid__list">
+          <li>Python + TensorFlow para la carga del modelo.</li>
+          <li>FastAPI para exponer un endpoint <code>/predict</code> local.</li>
+          <li>Procesamiento de imágenes en memoria (sin guardar archivos).</li>
+          <li>Listo para integrarse con frontends web o apps de escritorio.</li>
+        </ul>
+      </div>
+      <div class="tech-grid__col">
+        <h3 class="tech-grid__title">Frontend</h3>
+        <ul class="tech-grid__list">
+          <li>Captura desde la webcam vía JavaScript.</li>
+          <li>Envío del frame al backend en formato base64.</li>
+          <li>Visualización del resultado sobre el recuadro de enfoque.</li>
+          <li>Preparado para una futura versión 100% en navegador usando TF.js.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Roadmap -->
+  <section id="roadmap" class="section">
+    <div class="section__header">
+      <h2 class="section__title">Roadmap del proyecto</h2>
+      <p class="section__subtitle">
+        EcoVision Perú está pensado como un proyecto que pueda crecer: más clases, mejor detección
+        y despliegue en distintos dispositivos.
+      </p>
+    </div>
+
+    <div class="timeline">
+      <div class="timeline__item">
+        <div class="timeline__bullet"></div>
+        <div class="timeline__content">
+          <h3 class="timeline__title">v1 · Demo local con cámara</h3>
+          <p class="timeline__text">
+            Clasificación de plásticos PC, PE, PET, PP y PS en un entorno local usando un modelo
+            propio entrenado y un frontend sencillo basado en HTML + JS.
+          </p>
+        </div>
+      </div>
+      <div class="timeline__item">
+        <div class="timeline__bullet"></div>
+        <div class="timeline__content">
+          <h3 class="timeline__title">v2 · Detección de objetos (YOLO + EcoVision)</h3>
+          <p class="timeline__text">
+            Integración de un modelo de detección como YOLO para localizar automáticamente
+            objetos en la escena y enviar el recorte al clasificador de plásticos.
+          </p>
+        </div>
+      </div>
+      <div class="timeline__item">
+        <div class="timeline__bullet"></div>
+        <div class="timeline__content">
+          <h3 class="timeline__title">v3 · Web y móvil</h3>
+          <p class="timeline__text">
+            Conversión del modelo a TensorFlow.js y/o TFLite para correr completamente
+            en el navegador o en dispositivos móviles sin depender de un backend pesado.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer__left">
+      <div class="nav__logo">
+        <div class="nav__logo-mark">EV</div>
+        <div class="nav__logo-text">
+          <span class="nav__brand-main">EcoVision</span>
+          <span class="nav__brand-sub">Perú</span>
+        </div>
+      </div>
+      <p class="footer__text">
+        Proyecto académico de visión computacional para la clasificación de plásticos,
+        ejecutado en local y pensado para integrarse con soluciones reales de reciclaje.
+      </p>
+    </div>
+    <div class="footer__right">
+      <div class="footer__group">
+        <h4 class="footer__group-title">Explorar</h4>
+        <a href="#hero" class="footer__link">Inicio</a>
+        <a href="#how" class="footer__link">Cómo funciona</a>
+        <a href="#usecases" class="footer__link">Casos de uso</a>
+      </div>
+      <div class="footer__group">
+        <h4 class="footer__group-title">Demo</h4>
+        <a href="classify.html" class="footer__link">Probar con cámara</a>
+        <a href="#tech" class="footer__link">Detalles técnicos</a>
+      </div>
+      <div class="footer__group">
+        <h4 class="footer__group-title">Siguiente paso</h4>
+        <p class="footer__hint">
+          Integrar detección de objetos (YOLO) y desplegar el modelo en web/móvil.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
