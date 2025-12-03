@@ -1,5 +1,8 @@
 fastapi
 uvicorn
-Pillow
-tensorflow
 numpy
+pillow
+pydantic
+tensorflow
+opencv-python
+python-multipart
