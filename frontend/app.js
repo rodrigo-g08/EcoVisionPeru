@@ -2,6 +2,7 @@
 // Scroll suave en index.html
 // =========================
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("[EV] DOMContentLoaded");
   const scrollButtons = document.querySelectorAll("[data-scroll]");
   scrollButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -24,6 +25,8 @@ document.addEventListener("DOMContentLoaded", () => {
 // DEMO CON CÁMARA + UPLOAD
 // =========================
 function initCameraPage() {
+  console.log("[EV] initCameraPage() llamado");
+
   const video = document.getElementById("cameraVideo");
   const canvasOverlay = document.getElementById("cameraOverlay");
   const hintEl = document.getElementById("cameraHint");
@@ -38,6 +41,7 @@ function initCameraPage() {
 
   // Si no encontramos el video, no estamos en classify.html
   if (!video || !canvasOverlay || !btnStart || !btnCapture) {
+    console.log("[EV] No es classify.html (faltan elementos de cámara)");
     return;
   }
 
@@ -50,6 +54,7 @@ function initCameraPage() {
   // Inicializar cámara
   // =========================
   btnStart.addEventListener("click", async () => {
+    console.log("[EV] click en Activar cámara");
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       hintEl.textContent =
         "Tu navegador no soporta acceso a la cámara (getUserMedia). Prueba con Chrome o Edge.";
@@ -86,6 +91,7 @@ function initCameraPage() {
 
   // Cuando el video esté listo, ajustamos el canvas y empezamos a dibujar el recuadro
   video.addEventListener("loadedmetadata", () => {
+    console.log("[EV] video loadedmetadata");
     const rect = video.getBoundingClientRect();
     canvasOverlay.width = rect.width;
     canvasOverlay.height = rect.height;
@@ -136,6 +142,7 @@ function initCameraPage() {
   // Captura desde cámara y envío al backend
   // =========================
   async function captureAndPredict() {
+    console.log("[EV] captureAndPredict() llamado");
     if (!streaming) {
       hintEl.textContent = "Activa la cámara primero.";
       return;
@@ -165,6 +172,7 @@ function initCameraPage() {
     tctx.drawImage(video, sx, sy, side, side, 0, 0, side, side);
 
     const dataUrl = tempCanvas.toDataURL("image/jpeg", 0.9);
+    console.log("[EV] dataUrl generado desde cámara");
 
     await sendToBackend(dataUrl);
   }
@@ -173,16 +181,21 @@ function initCameraPage() {
   // Upload de archivo y envío al backend
   // =========================
   async function uploadAndPredict() {
+    console.log("[EV] uploadAndPredict() llamado");
+
     if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
       resultHint.textContent = "Selecciona primero una imagen JPG o PNG.";
+      console.log("[EV] No hay archivo seleccionado");
       return;
     }
 
     const file = fileInput.files[0];
+    console.log("[EV] Archivo seleccionado:", file.name, file.type);
 
     if (!file.type.startsWith("image/")) {
       resultHint.textContent =
         "El archivo debe ser una imagen (JPG, PNG, etc.).";
+      console.log("[EV] Tipo de archivo NO es imagen");
       return;
     }
 
@@ -195,6 +208,7 @@ function initCameraPage() {
           reject(reader.error || new Error("Error al leer el archivo."));
         reader.readAsDataURL(file);
       });
+      console.log("[EV] Imagen leída como DataURL (upload)");
     } catch (err) {
       console.error("Error leyendo el archivo:", err);
       resultLabel.textContent = "No se pudo leer la imagen seleccionada.";
@@ -210,6 +224,7 @@ function initCameraPage() {
   // Enviar imagen (base64) al backend
   // =========================
   async function sendToBackend(dataUrl) {
+    console.log("[EV] Enviando al backend /predict");
     setResultLoading(true);
 
     try {
@@ -219,11 +234,14 @@ function initCameraPage() {
         body: JSON.stringify({ image_base64: dataUrl }),
       });
 
+      console.log("[EV] Respuesta HTTP:", res.status);
+
       if (!res.ok) {
         throw new Error("Respuesta no OK del servidor");
       }
 
       const json = await res.json();
+      console.log("[EV] JSON recibido:", json);
       const cls = json.class;
       const conf = json.confidence;
 
@@ -308,13 +326,18 @@ function initCameraPage() {
   // Upload: habilitar botón y lanzar predicción
   if (fileInput && btnUpload) {
     fileInput.addEventListener("change", () => {
-      btnUpload.disabled =
-        !fileInput.files || fileInput.files.length === 0;
+      const enabled = !!(fileInput.files && fileInput.files.length > 0);
+      console.log("[EV] fileInput change, enabled =", enabled);
+      btnUpload.disabled = !enabled;
     });
 
-    btnUpload.addEventListener("click", () => {
+    btnUpload.addEventListener("click", (e) => {
+      e.preventDefault(); // por si acaso
+      console.log("[EV] click en btnUploadPredict");
       uploadAndPredict();
     });
+  } else {
+    console.log("[EV] No se encontró fileInput o btnUploadPredict");
   }
 
   // Atajos de teclado
