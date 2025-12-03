@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // =========================
-// DEMO CON CÁMARA
+// DEMO CON CÁMARA + UPLOAD
 // =========================
 function initCameraPage() {
   const video = document.getElementById("cameraVideo");
@@ -33,6 +33,8 @@ function initCameraPage() {
   const resultConfidence = document.getElementById("resultConfidence");
   const resultHint = document.getElementById("resultHint");
   const historyList = document.getElementById("historyList");
+  const fileInput = document.getElementById("fileInput");
+  const btnUpload = document.getElementById("btnUploadPredict");
 
   // Si no encontramos el video, no estamos en classify.html
   if (!video || !canvasOverlay || !btnStart || !btnCapture) {
@@ -48,14 +50,12 @@ function initCameraPage() {
   // Inicializar cámara
   // =========================
   btnStart.addEventListener("click", async () => {
-    // Comprobar soporte del navegador
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       hintEl.textContent =
         "Tu navegador no soporta acceso a la cámara (getUserMedia). Prueba con Chrome o Edge.";
       return;
     }
 
-    // Comprobar contexto seguro: http://localhost, 127.0.0.1 o https
     const isLocalhost =
       location.hostname === "localhost" || location.hostname === "127.0.0.1";
     const isSecure = window.isSecureContext || isLocalhost;
@@ -86,7 +86,6 @@ function initCameraPage() {
 
   // Cuando el video esté listo, ajustamos el canvas y empezamos a dibujar el recuadro
   video.addEventListener("loadedmetadata", () => {
-    // Ajustar canvas al tamaño visual del contenedor de video
     const rect = video.getBoundingClientRect();
     canvasOverlay.width = rect.width;
     canvasOverlay.height = rect.height;
@@ -117,8 +116,8 @@ function initCameraPage() {
   }
 
   // =========================
-  // Dibujar overlay (recuadro + texto)
-  // =========================
+  // Dibujar overlay (recuadro)
+// =========================
   function drawOverlayLoop() {
     if (!streaming) return;
 
@@ -134,7 +133,7 @@ function initCameraPage() {
   }
 
   // =========================
-  // Captura y envío al backend
+  // Captura desde cámara y envío al backend
   // =========================
   async function captureAndPredict() {
     if (!streaming) {
@@ -154,24 +153,63 @@ function initCameraPage() {
       return;
     }
 
-    // Tomamos un recorte cuadrado central del frame de video
     const side = Math.min(vw, vh) * BOX_RELATIVE_SIZE;
     const sx = (vw - side) / 2;
     const sy = (vh - side) / 2;
 
-    // Canvas temporal para el recorte
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = side;
     tempCanvas.height = side;
     const tctx = tempCanvas.getContext("2d");
 
-    // Dibujamos el frame del video y recortamos la región central
     tctx.drawImage(video, sx, sy, side, side, 0, 0, side, side);
 
-    // Convertimos a base64
     const dataUrl = tempCanvas.toDataURL("image/jpeg", 0.9);
 
-    // Enviar al backend
+    await sendToBackend(dataUrl);
+  }
+
+  // =========================
+  // Upload de archivo y envío al backend
+  // =========================
+  async function uploadAndPredict() {
+    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+      resultHint.textContent = "Selecciona primero una imagen JPG o PNG.";
+      return;
+    }
+
+    const file = fileInput.files[0];
+
+    if (!file.type.startsWith("image/")) {
+      resultHint.textContent =
+        "El archivo debe ser una imagen (JPG, PNG, etc.).";
+      return;
+    }
+
+    let dataUrl;
+    try {
+      dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () =>
+          reject(reader.error || new Error("Error al leer el archivo."));
+        reader.readAsDataURL(file);
+      });
+    } catch (err) {
+      console.error("Error leyendo el archivo:", err);
+      resultLabel.textContent = "No se pudo leer la imagen seleccionada.";
+      resultConfidence.textContent = "";
+      resultHint.textContent = "Intenta con otro archivo JPG o PNG.";
+      return;
+    }
+
+    await sendToBackend(dataUrl);
+  }
+
+  // =========================
+  // Enviar imagen (base64) al backend
+  // =========================
+  async function sendToBackend(dataUrl) {
     setResultLoading(true);
 
     try {
@@ -196,7 +234,8 @@ function initCameraPage() {
       resultLabel.textContent = "Error al conectar con el backend.";
       resultConfidence.textContent =
         "Asegúrate de que el servidor (FastAPI) esté corriendo en http://127.0.0.1:8000.";
-      resultHint.textContent = "Ejecuta: uvicorn server:app --reload en la carpeta backend.";
+      resultHint.textContent =
+        "Ejecuta: uvicorn server:app --reload en la carpeta backend.";
     } finally {
       setResultLoading(false);
     }
@@ -208,7 +247,8 @@ function initCameraPage() {
   function setResultLoading(isLoading) {
     if (isLoading) {
       resultLabel.textContent = "Clasificando...";
-      resultConfidence.textContent = "Procesando la imagen en el modelo MobileNetV5.";
+      resultConfidence.textContent =
+        "Procesando la imagen en el modelo MobileNetV5.";
       resultHint.textContent = "";
     }
   }
@@ -246,8 +286,11 @@ function initCameraPage() {
     line.appendChild(left);
     line.appendChild(right);
 
-    // Si es la primera entrada, limpiamos el texto inicial
-    if (historyList && historyList.firstElementChild && historyList.firstElementChild.tagName === "P") {
+    if (
+      historyList &&
+      historyList.firstElementChild &&
+      historyList.firstElementChild.tagName === "P"
+    ) {
       historyList.innerHTML = "";
     }
 
@@ -262,12 +305,24 @@ function initCameraPage() {
     captureAndPredict();
   });
 
+  // Upload: habilitar botón y lanzar predicción
+  if (fileInput && btnUpload) {
+    fileInput.addEventListener("change", () => {
+      btnUpload.disabled =
+        !fileInput.files || fileInput.files.length === 0;
+    });
+
+    btnUpload.addEventListener("click", () => {
+      uploadAndPredict();
+    });
+  }
+
+  // Atajos de teclado
   document.addEventListener("keydown", (e) => {
     if (e.key === "c" || e.key === "C") {
       captureAndPredict();
     }
     if (e.key === "q" || e.key === "Q") {
-      // Limpiar overlays / texto (solo a nivel UI)
       resultLabel.textContent = "Aún no hay predicciones.";
       resultConfidence.textContent =
         "Captura un objeto para ver el tipo de plástico estimado.";
